@@ -13,7 +13,7 @@ public class Triangle {
         Arrays.sort(A);
         int len = A.length;
         for (int i = 2; i < len; i++) {
-            if (A[i] < A[i-1] + A[i-2]) {
+            if (A[i] < (long)A[i-1] + (long)A[i-2]) {
                 return 1;
             }
 
