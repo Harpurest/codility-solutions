@@ -1,11 +1,17 @@
 package sieve_of_eratosthenes;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class CountNonDivisible {
 
     public static void main(String[] args) {
         CountNonDivisible countNonDivisible = new CountNonDivisible();
         countNonDivisible.printArray(countNonDivisible.solution(new int[] {3, 1, 2, 3, 6}));
         countNonDivisible.printArray(countNonDivisible.solution(new int[] {2, 4}));
+        countNonDivisible.printArray(countNonDivisible.solution(new int[] {1, 2, 4, 8, 16}));
+        countNonDivisible.printArray(countNonDivisible.solution(new int[] {3, 9, 27, 36 }));
+        countNonDivisible.printArray(countNonDivisible.solution(new int[] {3, 1, 2, 3, 4, 12}));
     }
 
     private void printArray(int[] A) {
@@ -16,6 +22,35 @@ public class CountNonDivisible {
         }
         System.out.print("]");
         System.out.println();
+    }
+
+    // Break time constraint
+    public int[] wrongSolution(int[] A) {
+        int len = A.length;
+        int max = A[0];
+
+        for (int i = 1; i < len; i++) {
+            if(A[i] > max) {
+                max = A[i];
+            }
+        }
+
+        int[] counts = new int[max + 1];
+        for (int i = 0; i < len; i++) {
+            int step = A[i];
+            int current = step * step;
+            while(current <= max) {
+                counts[current] += 1;
+                current += step;
+            }
+        }
+
+        int[] results = new int[len];
+        for (int j = 0; j < len; j++) {
+            results[j] = len - counts[A[j]];
+        }
+
+        return results;
     }
 
     public int[] solution(int[] A) {
@@ -53,28 +88,37 @@ public class CountNonDivisible {
         }
 
         int[] results = new int[len];
+        Set<Integer> countSet = new HashSet<>();
 
         for (int j = 0; j < len; j++) {
             int target = A[j];
-            while (divs[target] > 0) {
-                results[j] += tracks[target];
-                results[j] += tracks[divs[target]];
-                int newTarget = target / divs[target];
-                // Root squared case
-                if (newTarget == divs[target]) {
-                    results[j] -= tracks[divs[target]];
-                }
-                target = newTarget;
-            }
-            if (A[j] != 1) {
-                results[j] += tracks[target] + tracks[1];
-            } else {
-                results[j] += tracks[target];
-            }
-        }
 
-        for (int j = 0; j < len; j++) {
+            if (target == 1) {
+                results[j] = len - tracks[target];
+                continue;
+            }
+
+            // Fix the case [3, 1, 2, 3, 4, 12] espaccially number 12
+            int trackingReverse = 1;
+
+            while (divs[target] > 0) {
+                countSet.add(target);
+                countSet.add(divs[target]);
+                countSet.add(trackingReverse);
+
+                trackingReverse *= divs[target];
+                target /= divs[target];
+            }
+
+            countSet.add(target);
+            countSet.add(trackingReverse);
+
+            for (int count : countSet) {
+                results[j] += tracks[count];
+            }
             results[j] = len - results[j];
+
+            countSet.clear();
         }
 
         return results;
