@@ -23,6 +23,18 @@ public class CountTriangles {
         int count = 0;
         Arrays.sort(A);
 
+        for (int i = 0; i < len - 2; i++) {
+            int k = i + 2;
+            for (int j = i + 1; j < len - 1; j++) {
+                while (k < len - 1 && A[k + 1] < A[i] + A[j]) {
+                    k += 1;
+                }
+                if (A[k] < A[i] + A[j]) {
+                    count += k - j;
+                }
+            }
+        }
+
         return count;
     }
 }
